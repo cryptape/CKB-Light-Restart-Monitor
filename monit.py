@@ -98,8 +98,9 @@ def Node_Get():
     peers = get_result.get_peers()
     for peer in peers:
         node_connected_duration_gauge.labels(node_id=peer['node_id']).set(int(peer["connected_duration"], 16))
-        node_connected_proved_best_known_header_height_gauge.labels(node_id=peer['node_id']).set(
-            int(peer['sync_state']['proved_best_known_header']['number'], 16))
+        if peer is not None and peer.get('sync_state') is not None and peer['sync_state'].get('proved_best_known_header') is not None:
+            node_connected_proved_best_known_header_height_gauge.labels(node_id=peer['node_id']).set(
+                int(peer['sync_state']['proved_best_known_header']['number'], 16))
 
     return Response(prometheus_client.generate_latest(CKB_Light_Chain), mimetype="text/plain")
 
